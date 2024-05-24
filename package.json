@@ -1,0 +1,63 @@
+{
+  "name": "module-type",
+  "version": "1.0.0-alpha.0",
+  "description": "Detect the module type of a running Node.js file.",
+  "type": "module",
+  "main": "dist",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/moduleType.js",
+      "require": "./dist/cjs/moduleType.cjs",
+      "default": "./dist/esm/moduleType.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "engineStrict": true,
+  "scripts": {
+    "prettier": "prettier -w .",
+    "lint": "eslint --ignore-pattern dist --ignore-pattern coverage .",
+    "build": "node build.js",
+    "prepack": "npm run build",
+    "pretest": "npm run build",
+    "test": "c8 --reporter=text --reporter=text-summary --reporter=lcov node --test --test-reporter=spec test/*.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "detect",
+    "node",
+    "module",
+    "type",
+    "runtime",
+    "commonjs",
+    "esmodule",
+    "cjs",
+    "esm"
+  ],
+  "author": "Morgan Ney <morganney@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/morganney/module-type.git"
+  },
+  "bugs": {
+    "url": "https://github.com/morganney/module-type/issues"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.3.0",
+    "c8": "^9.1.0",
+    "eslint": "^9.3.0",
+    "eslint-plugin-n": "^17.7.0",
+    "prettier": "^3.2.5"
+  },
+  "prettier": {
+    "arrowParens": "avoid",
+    "printWidth": 119,
+    "semi": false,
+    "singleQuote": true
+  }
+}
