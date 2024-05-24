@@ -18,6 +18,7 @@
   "engineStrict": true,
   "scripts": {
     "prettier": "prettier -w .",
+    "prelint": "npm run build",
     "lint": "eslint --ignore-pattern dist --ignore-pattern coverage .",
     "build": "node build.js",
     "prepack": "npm run build",
