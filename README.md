@@ -11,7 +11,7 @@ Whether this is useful remains to be seen, but might be for library/package auth
 
 If the project has:
 
-- `package.json` with `"type": "module'` or
+- `package.json` with `"type": "module"` or
 - Uses file extensions of `.mjs` or
 - Started node with `--experimental-default-type=module`
 
