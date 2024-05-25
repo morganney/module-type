@@ -5,7 +5,7 @@
 [![NPM version](https://img.shields.io/npm/v/module-type.svg)](https://www.npmjs.com/package/module-type)
 
 Detects the module type of a running Node.js file, either `module`, `commonjs`, or `unknown`.
-Wheter this is useful remains to be seen, but might be for library/package authors.
+Whether this is useful remains to be seen, but might be for library/package authors.
 
 ## Example
 
