@@ -27,7 +27,7 @@ If the project instead:
 
 - `package.json` with `"type": "commonjs"` (or undefined) or
 - Uses file extensions of `.cjs` or
-- Started node with `--experimental-default-type=module`
+- Started node with `--experimental-default-type=commonjs`
 
 Then:
 
