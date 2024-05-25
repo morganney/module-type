@@ -1,6 +1,6 @@
 {
-  "name": "module-type",
-  "version": "1.0.0-alpha.0",
+  "name": "node-module-type",
+  "version": "1.0.0-alpha.1",
   "description": "Detect the module type of a running Node.js file.",
   "type": "module",
   "main": "dist",

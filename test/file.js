@@ -1,4 +1,4 @@
 import { stdout } from 'node:process'
-import { moduleType } from 'module-type'
+import { moduleType } from 'node-module-type'
 
 stdout.write(await moduleType())

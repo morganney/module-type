@@ -1,8 +1,8 @@
-# [`module-type`](https://www.npmjs.com/package/module-type)
+# [`node-module-type`](https://www.npmjs.com/package/node-module-type)
 
 ![CI](https://github.com/morganney/module-type/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/morganney/module-type/graph/badge.svg?token=IQVLYK9W88)](https://codecov.io/gh/morganney/module-type)
-[![NPM version](https://img.shields.io/npm/v/module-type.svg)](https://www.npmjs.com/package/module-type)
+[![NPM version](https://img.shields.io/npm/v/node-module-type.svg)](https://www.npmjs.com/package/node-module-type)
 
 Detects the module type of a running Node.js file, either `module`, `commonjs`, or `unknown`.
 Whether this is useful remains to be seen, but might be for library/package authors.
@@ -18,7 +18,7 @@ If the project has:
 Then:
 
 ```js
-import { moduleType } from 'module-type'
+import { moduleType } from 'node-module-type'
 
 console.log(await moduleType()) // 'module'
 ```
@@ -32,7 +32,7 @@ If the project instead:
 Then:
 
 ```js
-const { moduleType } = require('module-type')
+const { moduleType } = require('node-module-type')
 const main = async () => {
   console.log(await moduleType()) // 'commonjs'
 }
@@ -49,7 +49,7 @@ Given:
 Then:
 
 ```ts
-import { moduleType } from 'module-type'
+import { moduleType } from 'node-module-type'
 
 ;(async () => {
   console.log('running in module mode ', await moduleType())
@@ -60,7 +60,7 @@ Produces output based on the `package.json`'s `type` or file extension when exec
 
 ## Output
 
-`module-type` and the corresponding exported function `moduleType` produces three possible output strings:
+`node-module-type` and the corresponding exported function `moduleType` produces three possible output strings:
 
 - `unknown` (only if something unexpected happens)
 - `module`
