@@ -41,7 +41,7 @@ const { moduleType } = require('node-module-type')
 console.log(moduleType()) // 'commonjs'
 ```
 
-This is all pretty obvious based on how `node-module-type` was loaded by the consuming package, however library authors publishing a [dual package](https://nodejs.org/api/packages.html#dual-commonjses-module-packages) can provide conditional logic based on what module context your code is running under.
+This is all pretty obvious based on how `node-module-type` was loaded by the consuming package, however library authors publishing a [dual package](https://nodejs.org/api/packages.html#dual-commonjses-module-packages) can provide conditional logic based on what module context your code is running under. For example, when consumed from a TypeScript project that compiles to different module systems based on `module` and `moduleResolution` from the `tsconfig.json`.
 
 ```js
 import { moduleType } from 'node-module-type'
@@ -49,18 +49,18 @@ import { moduleType } from 'node-module-type'
 
 const type = moduleType()
 
-if (moduleType === 'commonjs') {
+if (type === 'commonjs') {
   // Code running under CommonJS module scope
 }
 
-if (moduleType === 'module') {
+if (type === 'module') {
   // Code running under ES module scope
 }
 ```
 
 ## Output
 
-`node-module-type` and the corresponding exported function `moduleType` produces three possible output strings:
+`node-module-type` and the corresponding exported function `moduleType` produce three possible output strings:
 
 - `unknown` (only if something unexpected happens)
 - `module`
