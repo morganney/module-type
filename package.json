@@ -3,9 +3,10 @@
   "version": "1.0.0-rc.0",
   "description": "Detect the module type of a running Node.js file.",
   "type": "module",
-  "main": "dist",
+  "main": "./dist/esm/moduleType.js",
   "exports": {
     ".": {
+      "types": "./dist/moduleType.d.ts",
       "import": "./dist/esm/moduleType.js",
       "require": "./dist/cjs/moduleType.cjs",
       "default": "./dist/esm/moduleType.js"
@@ -20,11 +21,15 @@
     "prettier": "prettier -w .",
     "prelint": "npm run build",
     "lint": "eslint --ignore-pattern dist --ignore-pattern coverage .",
-    "build": "node build.js",
+    "build": "tsc && node build.js",
     "prepack": "npm run build",
     "pretest": "npm run build",
     "test": "c8 --reporter=text --reporter=text-summary --reporter=lcov node --test --test-reporter=spec test/*.js"
   },
+  "workspaces": [
+    "test/cjslib",
+    "test/esmlib"
+  ],
   "files": [
     "dist"
   ],
@@ -53,7 +58,8 @@
     "c8": "^9.1.0",
     "eslint": "^9.3.0",
     "eslint-plugin-n": "^17.7.0",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
   },
   "prettier": {
     "arrowParens": "avoid",

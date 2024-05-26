@@ -1,8 +1,15 @@
+import { cwd } from 'node:process'
 import { resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
-export const moduleType = () => {
-  const { stdout, stderr } = spawnSync('node', [resolve(import.meta.dirname, 'checkType.js')])
+/**
+ * Determines the module type of a running Node.js file.
+ *
+ * @param {string} wd - working directory of the spawned process.
+ * @returns {string} The type of module scope, either 'commonjs', 'module', or 'unknown'.
+ */
+export const moduleType = (wd = cwd()) => {
+  const { stdout, stderr } = spawnSync('node', [resolve(import.meta.dirname, 'checkType.js')], { cwd: wd })
   // Only one of err or out will be non-falsy strings
   const err = stderr.toString()
   const out = stdout.toString()

@@ -1,0 +1,10 @@
+{
+  "name": "cjslib",
+  "version": "1.0.0",
+  "description": "cjs lib",
+  "type": "commonjs",
+  "main": "index.js",
+  "dependencies": {
+    "node-module-type": "file:../.."
+  }
+}
