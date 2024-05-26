@@ -19,7 +19,9 @@ await writeFile(
   resolve(cjs, 'moduleType.cjs'),
   (await readFile(resolve(cjs, 'moduleType.js')))
     .toString()
-    .replace(/^export const moduleType/, 'exports.moduleType')
+    .replace(/from\s(.+)/g, 'require($1)')
+    .replace(/import\s{(.+)}/g, 'const {$1} =')
+    .replace(/export const moduleType/, 'exports.moduleType')
     .replace(/\bimport\.meta\.dirname\b/, '__dirname')
     .replace(/checkType\.js/, 'checkType.cjs'),
 )

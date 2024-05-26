@@ -1,12 +1,19 @@
-export const moduleType = async () => {
-  const { resolve } = await import('node:path')
-  const { spawnSync } = await import('node:child_process')
-  const { stdout, stderr } = spawnSync('node', [resolve(import.meta.dirname, 'checkType.js')])
-  let type = 'unknown'
+import { cwd } from 'node:process'
+import { resolve } from 'node:path'
+import { spawnSync } from 'node:child_process'
 
-  // Only one of these will be non-falsy strings
+/**
+ * Determines the module type of a running Node.js file.
+ *
+ * @param {string} wd - working directory of the spawned process.
+ * @returns {string} The type of module scope, either 'commonjs', 'module', or 'unknown'.
+ */
+export const moduleType = (wd = cwd()) => {
+  const { stdout, stderr } = spawnSync('node', [resolve(import.meta.dirname, 'checkType.js')], { cwd: wd })
+  // Only one of err or out will be non-falsy strings
   const err = stderr.toString()
   const out = stdout.toString()
+  let type = 'unknown'
 
   /**
    * Based on error messaging from v8

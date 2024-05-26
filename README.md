@@ -5,14 +5,18 @@
 [![NPM version](https://img.shields.io/npm/v/node-module-type.svg)](https://www.npmjs.com/package/node-module-type)
 
 Detects the module type of a running Node.js file, either `module`, `commonjs`, or `unknown`.
-Whether this is useful remains to be seen, but might be for library/package authors.
+Mostly useful for library/package authors and build toolchains.
+
+## Requirements
+
+- Node.js >= 20.11.0
 
 ## Example
 
 If the project has:
 
-- `package.json` with `"type": "module"` or
-- Uses file extensions of `.mjs` or
+- `package.json` with `"type": "module"`
+- Uses file extensions of `.mjs`
 - Started node with `--experimental-default-type=module`
 
 Then:
@@ -20,43 +24,39 @@ Then:
 ```js
 import { moduleType } from 'node-module-type'
 
-console.log(await moduleType()) // 'module'
+console.log(moduleType()) // 'module'
 ```
 
-If the project instead:
+If the project instead has:
 
-- `package.json` with `"type": "commonjs"` (or undefined) or
-- Uses file extensions of `.cjs` or
+- `package.json` with `"type": "commonjs"` (or undefined)
+- Uses file extensions of `.cjs`
 - Started node with `--experimental-default-type=commonjs`
 
 Then:
 
 ```js
 const { moduleType } = require('node-module-type')
-const main = async () => {
-  console.log(await moduleType()) // 'commonjs'
+
+console.log(moduleType()) // 'commonjs'
+```
+
+This is all pretty obvious based on how `node-module-type` was loaded by the consuming package, however library authors publishing a [dual package](https://nodejs.org/api/packages.html#dual-commonjses-module-packages) can provide conditional logic based on what module context your code is running under.
+
+```js
+import { moduleType } from 'node-module-type'
+// const { moduleType } = require('node-module-type') for CJS projects
+
+const type = moduleType()
+
+if (moduleType === 'commonjs') {
+  // Code running under CommonJS module scope
 }
 
-main()
+if (moduleType === 'module') {
+  // Code running under ES module scope
+}
 ```
-
-This is all pretty obvious based on how `module-type` was loaded, however in a TypeScript project you can execute your file directly, with something like [`tsx`](https://github.com/privatenumber/tsx), and then determine under which module system you are running.
-
-Given:
-
-- `tsconfig.json` with `"module": "NodeNext"` and `"moduleResolution": "NodeNext"`
-
-Then:
-
-```ts
-import { moduleType } from 'node-module-type'
-
-;(async () => {
-  console.log('running in module mode ', await moduleType())
-})()
-```
-
-Produces output based on the `package.json`'s `type` or file extension when exected with `tsx`.
 
 ## Output
 
