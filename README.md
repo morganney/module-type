@@ -42,7 +42,7 @@ console.log(moduleType()) // 'commonjs'
 
 This is all pretty obvious based on how `node-module-type` was loaded by the consuming package, however, library authors publishing a [dual package](https://nodejs.org/api/packages.html#dual-commonjses-module-packages) can provide conditional logic based on what module system your code is running under.
 
-For example, when using TypeScript that compiles to different module systems based on the [`module`](https://www.typescriptlang.org/tsconfig/#module) value and [detection](https://www.typescriptlang.org/docs/handbook/modules/reference.html#module-format-detection) is based on the value of `type` from th nearest `package.json` file.
+For example, when using TypeScript that compiles to different module systems where [detection](https://www.typescriptlang.org/docs/handbook/modules/reference.html#module-format-detection) is based on the [`module`](https://www.typescriptlang.org/tsconfig/#module) and nearest package.json `type` values.
 
 ```js
 import { moduleType } from 'node-module-type'
