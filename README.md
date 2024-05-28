@@ -4,8 +4,7 @@
 [![codecov](https://codecov.io/gh/morganney/module-type/graph/badge.svg?token=IQVLYK9W88)](https://codecov.io/gh/morganney/module-type)
 [![NPM version](https://img.shields.io/npm/v/node-module-type.svg)](https://www.npmjs.com/package/node-module-type)
 
-Detects the module type of a running Node.js file, either `module`, `commonjs`, or `unknown`.
-Mostly useful for library/package authors and build toolchains.
+Detects if a Node.js file is executed as an ES module or CommonJS.
 
 ## Requirements
 
@@ -29,7 +28,7 @@ console.log(moduleType()) // 'module'
 
 If the project instead has:
 
-- `package.json` with `"type": "commonjs"` (or undefined)
+- `package.json` with `"type": "commonjs"` (or omitted)
 - Uses file extensions of `.cjs`
 - Started node with `--experimental-default-type=commonjs`
 
@@ -41,11 +40,12 @@ const { moduleType } = require('node-module-type')
 console.log(moduleType()) // 'commonjs'
 ```
 
-This is all pretty obvious based on how `node-module-type` was loaded by the consuming package, however library authors publishing a [dual package](https://nodejs.org/api/packages.html#dual-commonjses-module-packages) can provide conditional logic based on what module context your code is running under. For example, when consumed from a TypeScript project that compiles to different module systems based on `module` and `moduleResolution` from the `tsconfig.json`.
+This is all pretty obvious based on how `node-module-type` was loaded by the consuming package, however, library authors publishing a [dual package](https://nodejs.org/api/packages.html#dual-commonjses-module-packages) can provide conditional logic based on what module system your code is running under.
+
+For example, when using TypeScript that compiles to different module systems where [detection](https://www.typescriptlang.org/docs/handbook/modules/reference.html#module-format-detection) is based on the [`module`](https://www.typescriptlang.org/tsconfig/#module) and nearest package.json `type` values.
 
 ```js
 import { moduleType } from 'node-module-type'
-// const { moduleType } = require('node-module-type') for CJS projects
 
 const type = moduleType()
 

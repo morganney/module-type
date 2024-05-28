@@ -1,6 +1,6 @@
 {
   "name": "node-module-type",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0",
   "description": "Detect the module type of a running Node.js file.",
   "type": "module",
   "main": "./dist/esm/moduleType.js",
@@ -34,13 +34,12 @@
     "dist"
   ],
   "keywords": [
-    "detect",
     "node",
-    "module",
-    "type",
     "runtime",
+    "es module",
     "commonjs",
-    "esmodule",
+    "module type",
+    "runtime",
     "cjs",
     "esm"
   ],
