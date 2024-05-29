@@ -60,6 +60,8 @@ if (type === 'module') {
 }
 ```
 
+See the [tslib test](test/tslib) for a more comprehensive example.
+
 ## Output
 
 `node-module-type` and the corresponding exported function `moduleType` produce three possible output strings:

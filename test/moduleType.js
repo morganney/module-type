@@ -2,7 +2,7 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { resolve, join } from 'node:path'
-import { writeFile, copyFile, rm } from 'node:fs/promises'
+import { writeFile, rm } from 'node:fs/promises'
 
 import { moduleType } from '../src/moduleType.js'
 
@@ -29,27 +29,37 @@ describe('moduleType', () => {
   })
 
   it('works with typescript libs', async () => {
-    const bdp = resolve(import.meta.dirname, '..', 'node_modules', '.bin', 'babel-dual-package')
-    const fileTs = resolve(import.meta.dirname, 'lib.ts')
-    const fileJs = resolve(import.meta.dirname, 'lib.js')
+    const nodeModulesBin = resolve(import.meta.dirname, '..', 'node_modules', '.bin')
+    const bdp = join(nodeModulesBin, 'babel-dual-package')
+    const tsx = join(nodeModulesBin, 'tsx')
     const dir = resolve(import.meta.dirname)
-    // Created by babel-dual-package
-    const cjsOut = resolve(import.meta.dirname, 'cjs')
-    const args = ['--extensions', '.ts', '--out-dir', dir, fileTs]
+    const tslibDir = resolve(dir, 'tslib')
+    const buildOut = join(tslibDir, 'dist')
+    const tryTs = join(tslibDir, 'try.ts')
+    const tryJs = join(buildOut, 'try.js')
+    const args = ['--copy-files', '--extensions', '.ts', '--out-dir', buildOut, tslibDir]
 
     // Dual build (CJS and ESM) with babel-dual-package
     spawnSync(bdp, args)
 
-    const { stdout } = spawnSync('node', [fileJs])
-    assert.ok(/imported esm/.test(stdout.toString()))
+    // Test ESM
+    const { stdout: es } = spawnSync('node', [tryJs])
+    assert.ok(/is esm/.test(es.toString()))
 
-    await writeFile(join(cjsOut, 'package.json'), JSON.stringify({ type: 'commonjs' }))
-    await copyFile(join(dir, 'file.cjs'), join(cjsOut, 'file.cjs'))
+    // Test CJS
+    await writeFile(join(buildOut, 'cjs', 'package.json'), JSON.stringify({ type: 'commonjs' }))
+    const { stdout: cjs } = spawnSync('node', [join(buildOut, 'cjs', 'try.cjs')])
+    assert.ok(/is cjs/.test(cjs.toString()))
 
-    const { stdout: cjs } = spawnSync('node', [resolve(cjsOut, 'lib.cjs')])
-    assert.ok(/imported cjs/.test(cjs.toString()))
+    // Run directly against TypeScript files
+    const { stdout: tsEsOut } = spawnSync(tsx, [tryTs])
+    assert.ok(/is esm/.test(tsEsOut.toString()))
+    await writeFile(join(tslibDir, 'package.json'), JSON.stringify({ type: 'commonjs' }))
+    const { stdout: tsCjsOut } = spawnSync(tsx, [tryTs])
+    assert.ok(/is cjs/.test(tsCjsOut.toString()))
 
-    await rm(cjsOut, { force: true, recursive: true })
-    await rm(fileJs)
+    // Cleanup and restore
+    await rm(buildOut, { force: true, recursive: true })
+    await writeFile(join(tslibDir, 'package.json'), JSON.stringify({ type: 'module' }))
   })
 })
