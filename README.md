@@ -51,10 +51,12 @@ const type = moduleType()
 
 if (type === 'commonjs') {
   // Code running under CommonJS module scope
+  import('some-cjs-dependency').then().catch()
 }
 
 if (type === 'module') {
   // Code running under ES module scope
+  import('some-esm-dependency').then().catch()
 }
 ```
 
