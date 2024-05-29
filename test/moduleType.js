@@ -1,7 +1,8 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { resolve } from 'node:path'
+import { resolve, join } from 'node:path'
+import { writeFile, copyFile, rm } from 'node:fs/promises'
 
 import { moduleType } from '../src/moduleType.js'
 
@@ -25,5 +26,30 @@ describe('moduleType', () => {
     assert.equal(stdout.toString(), 'commonjs')
     assert.equal(cjslib.toString(), 'commonjs')
     assert.equal(cjsext.toString(), 'commonjs')
+  })
+
+  it('works with typescript libs', async () => {
+    const bdp = resolve(import.meta.dirname, '..', 'node_modules', '.bin', 'babel-dual-package')
+    const fileTs = resolve(import.meta.dirname, 'lib.ts')
+    const fileJs = resolve(import.meta.dirname, 'lib.js')
+    const dir = resolve(import.meta.dirname)
+    // Created by babel-dual-package
+    const cjsOut = resolve(import.meta.dirname, 'cjs')
+    const args = ['--extensions', '.ts', '--out-dir', dir, fileTs]
+
+    // Dual build (CJS and ESM) with babel-dual-package
+    spawnSync(bdp, args)
+
+    const { stdout } = spawnSync('node', [fileJs])
+    assert.ok(/imported esm/.test(stdout.toString()))
+
+    await writeFile(join(cjsOut, 'package.json'), JSON.stringify({ type: 'commonjs' }))
+    await copyFile(join(dir, 'file.cjs'), join(cjsOut, 'file.cjs'))
+
+    const { stdout: cjs } = spawnSync('node', [resolve(cjsOut, 'lib.cjs')])
+    assert.ok(/imported cjs/.test(cjs.toString()))
+
+    await rm(cjsOut, { force: true, recursive: true })
+    await rm(fileJs)
   })
 })
