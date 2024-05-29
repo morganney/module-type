@@ -1,6 +1,6 @@
 {
   "name": "node-module-type",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Detect the module type of a running Node.js file.",
   "type": "module",
   "main": "./dist/esm/moduleType.js",
@@ -54,11 +54,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.3.0",
+    "@types/node": "^20.12.12",
     "babel-dual-package": "^1.1.3",
     "c8": "^9.1.0",
     "eslint": "^9.3.0",
     "eslint-plugin-n": "^17.7.0",
     "prettier": "^3.2.5",
+    "tsx": "^4.11.0",
     "typescript": "^5.4.5"
   },
   "prettier": {
