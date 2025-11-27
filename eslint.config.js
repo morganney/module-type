@@ -10,7 +10,7 @@ export default [
     },
   },
   {
-    files: ['**/*.cjs', 'test/cjslib/**/*.js', 'src/checkType.js'],
+    files: ['**/*.cjs', 'test/cjslib/**/*.js', 'test/ambiguous/file.cjs.js', 'src/checkType.js'],
     rules: {
       // This package is defined as a module, but needs to use `require` to work
       'no-undef': 'off',
