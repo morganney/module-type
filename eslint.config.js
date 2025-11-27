@@ -16,4 +16,15 @@ export default [
       'no-undef': 'off',
     },
   },
+  {
+    files: ['src/moduleType.js', 'test/moduleType.js'],
+    rules: {
+      'n/no-unsupported-features/node-builtins': [
+        'error',
+        {
+          ignores: ['import.meta.dirname', 'test.describe'],
+        },
+      ],
+    },
+  },
 ]

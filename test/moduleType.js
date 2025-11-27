@@ -2,7 +2,11 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { resolve, join } from 'node:path'
-import { writeFile, rm } from 'node:fs/promises'
+import { writeFile, rm, mkdtemp, chmod } from 'node:fs/promises'
+import process from 'node:process'
+import { once } from 'node:events'
+import { Worker } from 'node:worker_threads'
+import { tmpdir } from 'node:os'
 
 import { moduleType } from '../src/moduleType.js'
 
@@ -26,6 +30,100 @@ describe('moduleType', () => {
     assert.equal(stdout.toString(), 'commonjs')
     assert.equal(cjslib.toString(), 'commonjs')
     assert.equal(cjsext.toString(), 'commonjs')
+  })
+
+  /**
+   * Shims `node` via PATH so the spawned process only emits the canonical
+   * "Cannot use 'import.meta' outside a module" error on stderr, exercising the
+   * regex-based fallback path.
+   */
+  it('falls back to stderr detection when checkType.js cannot emit stdout', async () => {
+    const fakeNodeDir = await mkdtemp(join(tmpdir(), 'module-type-node-'))
+    const fakeNodePath = join(fakeNodeDir, 'node')
+    const script = ['#!/bin/sh', 'printf "Cannot use \'import.meta\' outside a module" >&2', 'exit 1'].join('\n')
+
+    await writeFile(fakeNodePath, script)
+    await chmod(fakeNodePath, 0o755)
+
+    const originalPath = process.env.PATH ?? ''
+    process.env.PATH = `${fakeNodeDir}:${originalPath}`
+
+    try {
+      assert.equal(moduleType(), 'commonjs')
+    } finally {
+      process.env.PATH = originalPath
+      await rm(fakeNodeDir, { recursive: true, force: true })
+    }
+  })
+
+  /**
+   * Executes checkType.js inside a VM-based sandbox to mimic a CommonJS runtime
+   * and force the branch that reports "commonjs".
+   */
+  it('detects commonjs scope when import.meta access throws', async () => {
+    const workerSource = `
+      const { parentPort, workerData } = require('node:worker_threads')
+      const { readFile } = require('node:fs/promises')
+      const { createContext, SourceTextModule, SyntheticModule } = require('node:vm')
+
+      async function run() {
+        try {
+          const code = await readFile(workerData.filePath, 'utf8')
+          const context = createContext({
+            require: { main: {} },
+            setTimeout,
+            clearTimeout,
+          })
+          context.globalThis = context
+
+          const outputs = []
+          const module = new SourceTextModule(code, {
+            context,
+            identifier: workerData.filePath,
+            initializeImportMeta() {
+              throw new Error('import.meta unavailable')
+            },
+            importModuleDynamically: async (specifier) => {
+              if (specifier === 'node:process') {
+                const synthetic = new SyntheticModule(['stdout'], function () {
+                  this.setExport('stdout', {
+                    write: (value) => outputs.push(String(value)),
+                  })
+                }, { context })
+                await synthetic.link(() => {})
+                await synthetic.evaluate()
+                return synthetic
+              }
+
+              throw new Error('Unsupported specifier: ' + specifier)
+            },
+          })
+
+          await module.link(() => {})
+          await module.evaluate()
+          await new Promise((resolve) => setImmediate(resolve))
+          parentPort.postMessage({ output: outputs.join('') })
+        } catch (error) {
+          parentPort.postMessage({ error: { message: error.message, stack: error.stack } })
+        }
+      }
+
+      run()
+    `.trim()
+    const worker = new Worker(workerSource, {
+      eval: true,
+      workerData: { filePath: resolve(import.meta.dirname, '../src/checkType.js') },
+      execArgv: ['--experimental-vm-modules'],
+    })
+    const [message] = await once(worker, 'message')
+
+    await worker.terminate()
+
+    if (message.error) {
+      throw new Error(message.error.stack ?? message.error.message)
+    }
+
+    assert.equal(message.output, 'commonjs')
   })
 
   it('works with typescript libs', async () => {
