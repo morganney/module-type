@@ -128,20 +128,22 @@ describe('moduleType', () => {
 
   /**
    * Tests that ambiguous modules (no type field in package.json) are correctly
-   * detected as ESM when using import/export syntax. This validates Node's
-   * automatic module type detection (--experimental-detect-module, enabled by
-   * default since v22.7.0).
+   * detected. Node runs ambiguous modules first as CommonJS by default, and
+   * only re-parses as ESM if CommonJS parsing fails due to ESM syntax.
    *
    * @see https://nodejs.org/api/cli.html#--experimental-detect-module
    */
   it('detects module type in ambiguous packages (no type field)', () => {
-    // .js file with ESM syntax in a package without type field
+    // .js file with ESM syntax in a package without type field - detected as module
     const { stdout: jsExt } = spawnSync('node', [resolve(import.meta.dirname, 'ambiguous', 'index.js')])
-    // Extensionless file with ESM syntax in a package without type field
+    // Extensionless file with ESM syntax in a package without type field - detected as module
     const { stdout: noExt } = spawnSync('node', [resolve(import.meta.dirname, 'ambiguous', 'noext')])
+    // .js file with CommonJS syntax in a package without type field - runs as commonjs (default)
+    const { stdout: cjsSyntax } = spawnSync('node', [resolve(import.meta.dirname, 'ambiguous', 'file.cjs.js')])
 
     assert.equal(jsExt.toString(), 'module')
     assert.equal(noExt.toString(), 'module')
+    assert.equal(cjsSyntax.toString(), 'commonjs')
   })
 
   it('works with typescript libs', async () => {
