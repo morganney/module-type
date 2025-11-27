@@ -126,6 +126,24 @@ describe('moduleType', () => {
     assert.equal(message.output, 'commonjs')
   })
 
+  /**
+   * Tests that ambiguous modules (no type field in package.json) are correctly
+   * detected as ESM when using import/export syntax. This validates Node's
+   * automatic module type detection (--experimental-detect-module, enabled by
+   * default since v22.7.0).
+   *
+   * @see https://nodejs.org/api/cli.html#--experimental-detect-module
+   */
+  it('detects module type in ambiguous packages (no type field)', () => {
+    // .js file with ESM syntax in a package without type field
+    const { stdout: jsExt } = spawnSync('node', [resolve(import.meta.dirname, 'ambiguous', 'index.js')])
+    // Extensionless file with ESM syntax in a package without type field
+    const { stdout: noExt } = spawnSync('node', [resolve(import.meta.dirname, 'ambiguous', 'noext')])
+
+    assert.equal(jsExt.toString(), 'module')
+    assert.equal(noExt.toString(), 'module')
+  })
+
   it('works with typescript libs', async () => {
     const nodeModulesBin = resolve(import.meta.dirname, '..', 'node_modules', '.bin')
     const bdp = join(nodeModulesBin, 'babel-dual-package')

@@ -1,0 +1,9 @@
+{
+  "name": "ambiguous",
+  "version": "1.0.0",
+  "description": "ambiguous lib without type field",
+  "main": "index.js",
+  "dependencies": {
+    "node-module-type": "file:../.."
+  }
+}
