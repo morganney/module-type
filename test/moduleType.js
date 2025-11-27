@@ -40,11 +40,7 @@ describe('moduleType', () => {
   it('falls back to stderr detection when checkType.js cannot emit stdout', async () => {
     const fakeNodeDir = await mkdtemp(join(tmpdir(), 'module-type-node-'))
     const fakeNodePath = join(fakeNodeDir, 'node')
-    const script = [
-      '#!/bin/sh',
-      "printf \"Cannot use 'import.meta' outside a module\" >&2",
-      'exit 1',
-    ].join('\n')
+    const script = ['#!/bin/sh', 'printf "Cannot use \'import.meta\' outside a module" >&2', 'exit 1'].join('\n')
 
     await writeFile(fakeNodePath, script)
     await chmod(fakeNodePath, 0o755)
